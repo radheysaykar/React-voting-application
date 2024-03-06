@@ -15,7 +15,9 @@ function App() {
   const [candidates, setCandidates] = useState([]);
   const [number, setNumber] = useState('');
   const [CanVote, setCanVote] = useState(true);
-
+  const [winnerName, setwinnerName] = useState(null);
+  const [votersvote, setvotersvote] = useState(null);
+  const [votersvoteindex, setvotersvoteindex] = useState(null);
 
   useEffect( () => {
     getCandidates();
@@ -59,6 +61,20 @@ function App() {
 
   }
 
+  async function verifyVote() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+    const contractInstance = new ethers.Contract (
+      contractAddress, contractAbi, signer
+    );
+    const votersvote = await contractInstance.votersvote(await signer.getAddress());
+    setvotersvote(votersvote.toNumber());
+    const votersvoteindex = await contractInstance.votersvoteindex(await signer.getAddress());
+    setvotersvoteindex(votersvoteindex.toNumber());
+
+}
+
   async function getCandidates() {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
@@ -71,12 +87,36 @@ function App() {
         return {
           index: index,
           name: candidate.name,
-          voteCount: candidate.voteCount.toNumber()
+          // voteCount: candidate.voteCount.toNumber()
         }
       });
       setCandidates(formattedCandidates);
   }
 
+  async function getWinnerName() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+    const contractInstance = new ethers.Contract (
+      contractAddress, contractAbi, signer
+    );
+    const candidatesList = await contractInstance.getAllVotesOfCandiates();
+    const formattedCandidates = candidatesList.map((candidate, index) => {
+      return {
+        index: index,
+        name: candidate.name,
+        voteCount: candidate.voteCount.toNumber()
+      }
+    });
+    
+    // Find the candidate with the maximum votes
+    const winner = formattedCandidates.reduce((maxVotesCandidate, currentCandidate) => {
+      return currentCandidate.voteCount > maxVotesCandidate.voteCount ? currentCandidate : maxVotesCandidate;
+    }, formattedCandidates[0]);
+console.log(winnerName);
+    // Store the winner's name in WinnerName
+    setwinnerName(winner.name);
+  }
 
   async function getCurrentStatus() {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -137,7 +177,9 @@ function App() {
 
   return (
     <div className="App">
-      { votingStatus ? (isConnected ? (<Connected 
+      { 
+      votingStatus ?
+        (isConnected ? (<Connected 
                       account = {account}
                       candidates = {candidates}
                       remainingTime = {remainingTime}
@@ -148,7 +190,9 @@ function App() {
                       
                       : 
                       
-                      (<Login connectWallet = {connectToMetamask}/>)) : (<Finished />)}
+                      (<Login connectWallet = {connectToMetamask}/>)) 
+                      : (<Finished  name = {winnerName} getWinnerName = {getWinnerName} votersvote = {votersvote} votersvoteindex = {votersvoteindex} verifyVote = {verifyVote}/>)
+                      }
       
     </div>
   );

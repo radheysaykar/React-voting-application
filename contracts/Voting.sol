@@ -10,6 +10,8 @@ contract Voting {
     Candidate[] public candidates;
     address owner;
     mapping(address => bool) public voters;
+    mapping(address => uint256) public votersvote;
+    mapping(address => uint256) public votersvoteindex;
 
     uint256 public votingStart;
     uint256 public votingEnd;
@@ -44,6 +46,8 @@ constructor(string[] memory _candidateNames, uint256 _durationInMinutes) {
 
         candidates[_candidateIndex].voteCount++;
         voters[msg.sender] = true;
+        votersvote[msg.sender] = _candidateIndex;
+        votersvoteindex[msg.sender] = candidates[_candidateIndex].voteCount;
     }
 
     function getAllVotesOfCandiates() public view returns (Candidate[] memory){
