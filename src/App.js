@@ -18,6 +18,8 @@ function App() {
   const [winnerName, setwinnerName] = useState(null);
   const [votersvote, setvotersvote] = useState(null);
   const [votersvoteindex, setvotersvoteindex] = useState(null);
+  const [itemList, setItemList] = useState(["0xa3Aa429d5A5944B4C3ABd50b5B0505a53797f5C8"]);
+  
 
   useEffect( () => {
     getCandidates();
@@ -57,7 +59,16 @@ function App() {
         contractAddress, contractAbi, signer
       );
       const voteStatus = await contractInstance.voters(await signer.getAddress());
-      setCanVote(voteStatus);
+
+      const addressToCheck = (await signer.getAddress());
+
+      // Check if the addressToCheck is in itemList
+      const isAddressInList = itemList.includes(addressToCheck);
+
+      // Use the result in your component logic
+      console.log(isAddressInList, "&&&&&&&&&&&&&&&&&&&&"); // This will be either true or false
+
+      setCanVote(!voteStatus && isAddressInList);
 
   }
 
@@ -178,21 +189,23 @@ console.log(winnerName);
   return (
     <div className="App">
       { 
-      votingStatus ?
-        (isConnected ? (<Connected 
-                      account = {account}
-                      candidates = {candidates}
-                      remainingTime = {remainingTime}
-                      number= {number}
-                      handleNumberChange = {handleNumberChange}
-                      voteFunction = {vote}
-                      showButton = {CanVote}/>) 
-                      
-                      : 
-                      
-                      (<Login connectWallet = {connectToMetamask}/>)) 
-                      : (<Finished  name = {winnerName} getWinnerName = {getWinnerName} votersvote = {votersvote} votersvoteindex = {votersvoteindex} verifyVote = {verifyVote}/>)
-                      }
+      // votingStatus ?
+        (isConnected ? 
+          (<Connected 
+          account = {account}
+          candidates = {candidates}
+          remainingTime = {remainingTime}
+          number= {number}
+          handleNumberChange = {handleNumberChange}
+          voteFunction = {vote}
+          votingdone = {!CanVote}/>) 
+          
+          : 
+          
+          (<Login connectWallet = {connectToMetamask}/>)) 
+        // : 
+        // (<Finished  name = {winnerName} getWinnerName = {getWinnerName} votersvote = {votersvote} votersvoteindex = {votersvoteindex} verifyVote = {verifyVote}/>)
+      }
       
     </div>
   );
