@@ -1,99 +1,282 @@
 import { useState, useEffect } from 'react';
 import {ethers} from 'ethers';
-import {contractAbi, contractAddress} from './Constant/constant';
-import Login from './Components/Login';
+import PhoneNoLogin from './Components/PhoneNoLogin.jsx';
 import Finished from './Components/Finished';
 import Connected from './Components/Connected';
 import './App.css';
 
 function App() {
-  const [provider, setProvider] = useState(null);
-  const [account, setAccount] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
+  // const [provider, setProvider] = useState(null);
+  // const [account, setAccount] = useState(null);
+  // const [isConnected, setIsConnected] = useState(false);
+  // const [votersvote, setvotersvote] = useState(null);
+  // const [votersvoteindex, setvotersvoteindex] = useState(null);
+  // // const [itemList, setItemList] = useState(["0xa3Aa429d5A5944B4C3ABd50b5B0505a53797f5C8"]);
+  // const [candidateNumber, setCandidateNumber] = useState(0);  
+
   const [votingStatus, setVotingStatus] = useState(true);
   const [remainingTime, setremainingTime] = useState('');
   const [candidates, setCandidates] = useState([]);
-  const [number, setNumber] = useState('');
   const [CanVote, setCanVote] = useState(true);
-  const [winnerName, setwinnerName] = useState(null);
-  const [votersvote, setvotersvote] = useState(null);
-  const [votersvoteindex, setvotersvoteindex] = useState(null);
-  const [itemList, setItemList] = useState(["0xa3Aa429d5A5944B4C3ABd50b5B0505a53797f5C8"]);
+  // const [winnerName, setwinnerName] = useState(null);
+  const [voterID, setvoterID] = useState(null);;
+  const [contract, setContract] = useState(null);
   
+  useEffect(() => {
+
+  const provider = new ethers.JsonRpcProvider("https://volta-rpc.energyweb.org");
+  const contractAddress = "0x7D6A5697f8846855a39f488E08d77055bED3cD87"; // Replace with the deployed contract address
+  const signer = new ethers.Wallet("b3409f6f45ef522faf29c052914d13511ac5c6515aea2d138c6b9d70341815cf", provider); // Replace with the private key of your specified address
+  const SimpleStorageABI = [
+    {
+      "inputs": [
+        {
+          "internalType": "string[]",
+          "name": "_candidateNames",
+          "type": "string[]"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_durationInMinutes",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "voterID",
+          "type": "string"
+        }
+      ],
+      "name": "VerifyVote",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        }
+      ],
+      "name": "addCandidate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "candidates",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "voteCount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAllVotesOfCandiates",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "voteCount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Voting.Candidate[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getIndexOfMaxVoteCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getRemainingTime",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getVotingStatus",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "voterID",
+          "type": "string"
+        }
+      ],
+      "name": "hasVoted",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "voterID",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_candidateIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "vote",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "votingEnd",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "votingStart",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ];
+    setContract(new ethers.Contract(contractAddress, SimpleStorageABI, signer));
+  }, []);
 
   useEffect( () => {
+    console.log(votingStatus, "$$$$$$$$$voting status");
+    // console.log(voterID, "$$$$$$$$$contract");
     getCandidates();
     getRemainingTime();
     getCurrentStatus();
-    if (window.ethereum) {
-      window.ethereum.on('accountsChanged', handleAccountsChanged);
-    }
-
-    return() => {
-      if (window.ethereum) {
-        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
-      }
-    }
+    // verifyVote();
   });
+  useEffect( () => {
+    canVote();
+  }, [voterID]);
 
+  async function vote(candidateNumber) {
+    console.log(voterID, candidateNumber);
+    const tx = await contract.vote(voterID, parseInt(candidateNumber, 10));
 
-  async function vote() {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-      const contractInstance = new ethers.Contract (
-        contractAddress, contractAbi, signer
-      );
+    await tx.wait();
+    console.log("voting successful");
 
-      const tx = await contractInstance.vote(number);
-      await tx.wait();
-      canVote();
+    canVote();
   }
 
 
   async function canVote() {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-      const contractInstance = new ethers.Contract (
-        contractAddress, contractAbi, signer
-      );
-      const voteStatus = await contractInstance.voters(await signer.getAddress());
 
-      const addressToCheck = (await signer.getAddress());
-
-      // Check if the addressToCheck is in itemList
-      const isAddressInList = itemList.includes(addressToCheck);
-
-      // Use the result in your component logic
-      console.log(isAddressInList, "&&&&&&&&&&&&&&&&&&&&"); // This will be either true or false
-
-      setCanVote(!voteStatus && isAddressInList);
-
+    const voteStatus = await contract.hasVoted(voterID);
+    console.log("voting done:", voteStatus);
+    setCanVote(!voteStatus);
   }
 
   async function verifyVote() {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    const signer = provider.getSigner();
-    const contractInstance = new ethers.Contract (
-      contractAddress, contractAbi, signer
-    );
-    const votersvote = await contractInstance.votersvote(await signer.getAddress());
-    setvotersvote(votersvote.toNumber());
-    const votersvoteindex = await contractInstance.votersvoteindex(await signer.getAddress());
-    setvotersvoteindex(votersvoteindex.toNumber());
 
+    const [vote, voteIndex] = await contract.VerifyVote(voterID);
+    const numberA = Number(vote);
+    const numberB = Number(voteIndex);
+    console.log(numberA, numberB, "#######");
+    return [numberA, numberB];
 }
 
   async function getCandidates() {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-      const contractInstance = new ethers.Contract (
-        contractAddress, contractAbi, signer
-      );
-      const candidatesList = await contractInstance.getAllVotesOfCandiates();
+      const candidatesList = await contract.getAllVotesOfCandiates();
       const formattedCandidates = candidatesList.map((candidate, index) => {
         return {
           index: index,
@@ -105,117 +288,50 @@ function App() {
   }
 
   async function getWinnerName() {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    const signer = provider.getSigner();
-    const contractInstance = new ethers.Contract (
-      contractAddress, contractAbi, signer
-    );
-    const candidatesList = await contractInstance.getAllVotesOfCandiates();
-    const formattedCandidates = candidatesList.map((candidate, index) => {
-      return {
-        index: index,
-        name: candidate.name,
-        voteCount: candidate.voteCount.toNumber()
-      }
-    });
+
+    const winner = Number(await contract.getIndexOfMaxVoteCount());
+
+
+    return winner;
     
-    // Find the candidate with the maximum votes
-    const winner = formattedCandidates.reduce((maxVotesCandidate, currentCandidate) => {
-      return currentCandidate.voteCount > maxVotesCandidate.voteCount ? currentCandidate : maxVotesCandidate;
-    }, formattedCandidates[0]);
-console.log(winnerName);
-    // Store the winner's name in WinnerName
-    setwinnerName(winner.name);
   }
 
   async function getCurrentStatus() {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-      const contractInstance = new ethers.Contract (
-        contractAddress, contractAbi, signer
-      );
-      const status = await contractInstance.getVotingStatus();
-      console.log(status);
+      const status = await contract.getVotingStatus();
       setVotingStatus(status);
   }
 
   async function getRemainingTime() {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-      const contractInstance = new ethers.Contract (
-        contractAddress, contractAbi, signer
-      );
-      const time = await contractInstance.getRemainingTime();
+      const time = await contract.getRemainingTime();
       setremainingTime(parseInt(time, 16));
   }
 
-  function handleAccountsChanged(accounts) {
-    if (accounts.length > 0 && account !== accounts[0]) {
-      setAccount(accounts[0]);
-      canVote();
-    } else {
-      setIsConnected(false);
-      setAccount(null);
-    }
-  }
+  const logout = () => {
+    setvoterID(null);
+    window.location.reload();
 
-  async function connectToMetamask() {
-    if (window.ethereum) {
-      try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        setProvider(provider);
-        await provider.send("eth_requestAccounts", []);
-        const signer = provider.getSigner();
-        const address = await signer.getAddress();
-        setAccount(address);
-        console.log("Metamask Connected : " + address);
-        setIsConnected(true);
-        canVote();
-      } catch (err) {
-        console.error(err);
-      }
-    } else {
-      console.error("Metamask is not detected in the browser")
-    }
-  }
-
-  async function handleNumberChange(e) {
-    setNumber(e.target.value);
-  }
+  };
 
   return (
     <div className="App">
       { 
-      // votingStatus ?
-        (isConnected ? 
-          (<Connected 
-          account = {account}
-          candidates = {candidates}
-          remainingTime = {remainingTime}
-          number= {number}
-          handleNumberChange = {handleNumberChange}
-          voteFunction = {vote}
-          votingdone = {!CanVote}/>) 
-          
-          : 
-          
-          (<Login connectWallet = {connectToMetamask}/>)) 
-        // : 
-        // (<Finished  name = {winnerName} getWinnerName = {getWinnerName} votersvote = {votersvote} votersvoteindex = {votersvoteindex} verifyVote = {verifyVote}/>)
+        (voterID !== null) ? 
+        ( votingStatus ?
+            (<Connected 
+              voterID = {voterID}
+              remainingTime = {remainingTime}
+              logout = {logout}
+              candidates = {candidates}
+              vote = {vote}
+              CanVote = {CanVote}/>) 
+        :  (<Finished  getWinnerName = {getWinnerName} verifyVote = {verifyVote} logout = {logout}/>))
+        :
+        <PhoneNoLogin setvoterID = {setvoterID}/>
       }
       
     </div>
   );
 
-
-
 }
-
-
-
-
 
 export default App;

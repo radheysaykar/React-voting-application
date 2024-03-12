@@ -6,12 +6,18 @@ contract Voting {
         string name;
         uint256 voteCount;
     }
+    
+    struct Voter {
+        bool voted;
+        uint256 vote;
+        uint256 voteIndex;
+    }
 
     Candidate[] public candidates;
+
     address owner;
-    mapping(address => bool) public voters;
-    mapping(address => uint256) public votersvote;
-    mapping(address => uint256) public votersvoteindex;
+    
+    mapping(string => Voter) IDtoVoter;
 
     uint256 public votingStart;
     uint256 public votingEnd;
@@ -40,15 +46,23 @@ constructor(string[] memory _candidateNames, uint256 _durationInMinutes) {
         }));
     }
 
-    function vote(uint256 _candidateIndex) public {
-        require(!voters[msg.sender], "You have already voted.");
+    function vote(string memory voterID, uint256 _candidateIndex) public {
+        require(!IDtoVoter[voterID].voted, "You have already voted.");
         require(_candidateIndex < candidates.length, "Invalid candidate index.");
 
         candidates[_candidateIndex].voteCount++;
-        voters[msg.sender] = true;
-        votersvote[msg.sender] = _candidateIndex;
-        votersvoteindex[msg.sender] = candidates[_candidateIndex].voteCount;
+        IDtoVoter[voterID].voted = true;
+        IDtoVoter[voterID].vote = _candidateIndex;
+        IDtoVoter[voterID].voteIndex = candidates[_candidateIndex].voteCount;
     }
+
+    function VerifyVote(string memory voterID) public view returns (uint256, uint256) {
+        return (IDtoVoter[voterID].vote, IDtoVoter[voterID].voteIndex);
+    }
+
+    function hasVoted(string memory voterID) public view returns (bool) {
+        return (IDtoVoter[voterID].voted);
+    } 
 
     function getAllVotesOfCandiates() public view returns (Candidate[] memory){
         return candidates;
@@ -64,5 +78,20 @@ constructor(string[] memory _candidateNames, uint256 _durationInMinutes) {
             return 0;
     }
         return votingEnd - block.timestamp;
+    }
+    function getIndexOfMaxVoteCount() public view returns (uint256) {
+        require(candidates.length > 0, "No candidates available.");
+
+        uint256 maxVoteCount = 0;
+        uint256 indexOfMaxVoteCount = 0;
+
+        for (uint256 i = 0; i < candidates.length; i++) {
+            if (candidates[i].voteCount > maxVoteCount) {
+                maxVoteCount = candidates[i].voteCount;
+                indexOfMaxVoteCount = i;
+            }
+        }
+
+        return indexOfMaxVoteCount;
     }
 }

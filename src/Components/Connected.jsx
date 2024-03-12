@@ -1,21 +1,33 @@
 import React from "react";
+import { useState, useEffect } from 'react';
 
 const Connected = (props) => {
+    const [candidateNumber, setCandidateNumber] = useState(0); 
+
+    const callVote = () => {
+        props.vote(candidateNumber);
+    };
+    const handleInputChange = (event) => {
+        const newValue = parseInt(event.target.value, 10); // Convert input value to an integer
+        setCandidateNumber(newValue);
+      };
+// console.log("props.voterID... ", props.voterID);
     return (
         <div className="connected-container">
-            <h1 className="connected-header">You are Connected to Metamask</h1>
-            <p className="connected-account">Metamask Account: {props.account}</p>
+            <p className="connected-account"> Account: {props.voterID}</p>
             <p className="connected-account">Remaining Time: {props.remainingTime}</p>
-            { props.votingdone ? (
-                <p className="connected-account">You can not vote</p>
-            ) : (
+            { props.CanVote ? (
                 <div>
-                    <input type="number" placeholder="Entern Candidate Index" value={props.number} onChange={props.handleNumberChange}></input>
-            <br />
-            <button className="login-button" onClick={props.voteFunction}>Vote</button>
+                    <input type="number" placeholder="Entern Candidate Index" value={candidateNumber} onChange={handleInputChange}></input>
+                <br />
+                <button className="login-button" onClick={callVote}>Vote</button>
 
-                </div>
-            )}
+                    </div>
+                ) :
+                (
+                    <p className="connected-account">You can not vote</p>
+                )
+            }
             
             <table id="myTable" className="candidates-table">
                 <thead>
@@ -35,7 +47,8 @@ const Connected = (props) => {
                 ))}
                 </tbody>
             </table>
-            
+            <button className="logout-button" onClick={props.logout}>Logout</button>
+
         </div>
     )
 }
