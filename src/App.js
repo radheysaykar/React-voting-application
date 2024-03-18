@@ -6,27 +6,16 @@ import Connected from './Components/Connected';
 import './App.css';
 
 function App() {
-  // const [provider, setProvider] = useState(null);
-  // const [account, setAccount] = useState(null);
-  // const [isConnected, setIsConnected] = useState(false);
-  // const [votersvote, setvotersvote] = useState(null);
-  // const [votersvoteindex, setvotersvoteindex] = useState(null);
-  // // const [itemList, setItemList] = useState(["0xa3Aa429d5A5944B4C3ABd50b5B0505a53797f5C8"]);
-  // const [candidateNumber, setCandidateNumber] = useState(0);  
 
   const [votingStatus, setVotingStatus] = useState(true);
   const [remainingTime, setremainingTime] = useState('');
   const [candidates, setCandidates] = useState([]);
   const [CanVote, setCanVote] = useState(true);
-  // const [winnerName, setwinnerName] = useState(null);
   const [voterID, setvoterID] = useState(null);;
   const [contract, setContract] = useState(null);
-  
-  useEffect(() => {
-
-  const provider = new ethers.JsonRpcProvider("https://volta-rpc.energyweb.org");
-  const contractAddress = "0x7D6A5697f8846855a39f488E08d77055bED3cD87"; // Replace with the deployed contract address
-  const signer = new ethers.Wallet("b3409f6f45ef522faf29c052914d13511ac5c6515aea2d138c6b9d70341815cf", provider); // Replace with the private key of your specified address
+  const CONTRACT_ADDRESS ="0x7D6A5697f8846855a39f488E08d77055bED3cD87"
+  const PRIVATE_KEY = "b3409f6f45ef522faf29c052914d13511ac5c6515aea2d138c6b9d70341815cf"
+  const API_URL = "https://volta-rpc.energyweb.org"
   const SimpleStorageABI = [
     {
       "inputs": [
@@ -233,90 +222,144 @@ function App() {
       "type": "function"
     }
   ];
-    setContract(new ethers.Contract(contractAddress, SimpleStorageABI, signer));
+
+  useEffect(() => {
+// console.log("**************");
+  const provider = new ethers.JsonRpcProvider(API_URL);
+  const signer = new ethers.Wallet(PRIVATE_KEY, provider); // Replace with the private key of your specified address
+  
+    setContract(new ethers.Contract(CONTRACT_ADDRESS, SimpleStorageABI, signer));
+
+    getCandidates();
+
+    // while(!contract);
   }, []);
 
   useEffect( () => {
-    console.log(votingStatus, "$$$$$$$$$voting status");
-    // console.log(voterID, "$$$$$$$$$contract");
-    getCandidates();
+    
+    // console.log(votingStatus, "$$$$$$$$$voting status");
+    // console.log(contract, "$$$$$$$$$contract");
     getRemainingTime();
     getCurrentStatus();
     // verifyVote();
   });
+
   useEffect( () => {
+    // console.log("***&&&&&&&&&&&&&&&&***");
+
     canVote();
   }, [voterID]);
 
-  async function vote(candidateNumber) {
+async function vote(candidateNumber) {
+  try {
+    if (!contract) return;
+
     console.log(voterID, candidateNumber);
     const tx = await contract.vote(voterID, parseInt(candidateNumber, 10));
 
     await tx.wait();
     console.log("voting successful");
 
-    canVote();
+    await canVote();
+  } catch (error) {
+    console.error('Error while voting:', error);
+    // Handle error gracefully (e.g., show an error message to the user)
   }
+}
 
-
-  async function canVote() {
+async function canVote() {
+  try {
+    if (!contract) return;
 
     const voteStatus = await contract.hasVoted(voterID);
     console.log("voting done:", voteStatus);
     setCanVote(!voteStatus);
+  } catch (error) {
+    console.error('Error while checking voting status:', error);
+    // Handle error gracefully (e.g., show an error message to the user)
   }
+}
 
-  async function verifyVote() {
+async function verifyVote() {
+  try {
+    if (!contract) return;
 
     const [vote, voteIndex] = await contract.VerifyVote(voterID);
     const numberA = Number(vote);
     const numberB = Number(voteIndex);
     console.log(numberA, numberB, "#######");
     return [numberA, numberB];
+  } catch (error) {
+    console.error('Error while verifying vote:', error);
+    // Handle error gracefully (e.g., show an error message to the user)
+    return null;
+  }
 }
 
-  async function getCandidates() {
-      const candidatesList = await contract.getAllVotesOfCandiates();
-      const formattedCandidates = candidatesList.map((candidate, index) => {
-        return {
-          index: index,
-          name: candidate.name,
-          // voteCount: candidate.voteCount.toNumber()
-        }
-      });
-      setCandidates(formattedCandidates);
-  }
+async function getCandidates() {
+  try {
+    if (!contract) return;
 
-  async function getWinnerName() {
+    const candidatesList = await contract.getAllVotesOfCandiates();
+    const formattedCandidates = candidatesList.map((candidate, index) => ({
+      index: index,
+      name: candidate.name,
+      // voteCount: candidate.voteCount.toNumber()
+    }));
+    setCandidates(formattedCandidates);
+  } catch (error) {
+    console.error('Error while fetching candidates:', error);
+    // Handle error gracefully (e.g., show an error message to the user)
+  }
+}
+
+async function getWinnerName() {
+  try {
+    if (!contract) return;
 
     const winner = Number(await contract.getIndexOfMaxVoteCount());
-
-
     return winner;
-    
+  } catch (error) {
+    console.error('Error while fetching winner name:', error);
+    // Handle error gracefully (e.g., show an error message to the user)
+    return null;
   }
+}
 
-  async function getCurrentStatus() {
-      const status = await contract.getVotingStatus();
-      setVotingStatus(status);
+async function getCurrentStatus() {
+  try {
+    if (!contract) return;
+
+    const status = await contract.getVotingStatus();
+    setVotingStatus(status);
+  } catch (error) {
+    console.error('Error while fetching current status:', error);
+    // Handle error gracefully (e.g., show an error message to the user)
   }
+}
 
-  async function getRemainingTime() {
-      const time = await contract.getRemainingTime();
-      setremainingTime(parseInt(time, 16));
+async function getRemainingTime() {
+  try {
+    if (!contract) return;
+
+    const time = await contract.getRemainingTime();
+    setremainingTime(parseInt(time, 16));
+  } catch (error) {
+    console.error('Error while fetching remaining time:', error);
+    // Handle error gracefully (e.g., show an error message to the user)
   }
+}
 
-  const logout = () => {
-    setvoterID(null);
-    window.location.reload();
+const logout = () => {
+  setvoterID(null);
+};
 
-  };
 
   return (
     <div className="App">
       { 
         (voterID !== null) ? 
-        ( votingStatus ?
+        // ( votingStatus ?
             (<Connected 
               voterID = {voterID}
               remainingTime = {remainingTime}
@@ -324,7 +367,7 @@ function App() {
               candidates = {candidates}
               vote = {vote}
               CanVote = {CanVote}/>) 
-        :  (<Finished  getWinnerName = {getWinnerName} verifyVote = {verifyVote} logout = {logout}/>))
+        // :  (<Finished  getWinnerName = {getWinnerName} verifyVote = {verifyVote} logout = {logout} not_voted = {CanVote}/>))
         :
         <PhoneNoLogin setvoterID = {setvoterID}/>
       }

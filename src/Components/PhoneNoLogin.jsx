@@ -15,41 +15,52 @@ const App = (props) => {
   const [loading, setLoading] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
 
-  function onCaptchVerify() {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        "recaptcha-container",
-        {
-          size: "invisible",
-          callback: (response) => {
-            onSignup();
+  async function onCaptchVerify() {
+    try {
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          "recaptcha-container",
+          {
+            size: "invisible",
+            callback: (response) => {
+              // onSignup();
+            },
+            "expired-callback": () => {},
           },
-          "expired-callback": () => {},
-        },
-        auth
-      );
+          auth
+        );
+      }
+    } catch (error) {
+      console.log(error);
     }
+    
   }
 
   function onSignup() {
-    setLoading(true);
-    onCaptchVerify();
-
-    const appVerifier = window.recaptchaVerifier;
-
-    const formatPh = "+" + ph;
-
-    signInWithPhoneNumber(auth, formatPh, appVerifier)
-      .then((confirmationResult) => {
-        window.confirmationResult = confirmationResult;
-        setLoading(false);
-        setShowOTP(true);
-        toast.success("OTP sended successfully!");
-      })
-      .catch((error) => {
-        console.log(error);
-        setLoading(false);
+    try {
+      setLoading(true);
+      onCaptchVerify().catch((err) => {
+        console.log(err);
       });
+
+      const appVerifier = window.recaptchaVerifier;
+
+      const formatPh = "+" + ph;
+
+      signInWithPhoneNumber(auth, formatPh, appVerifier)
+        .then((confirmationResult) => {
+          window.confirmationResult = confirmationResult;
+          setLoading(false);
+          setShowOTP(true);
+          toast.success("OTP sended successfully!");
+        })
+        .catch((error) => {
+          console.log(error, "^^^^^^^^^");
+          setLoading(false);
+        });
+    } catch (error) {
+        console.log(error);
+    }
   }
 
   function onOTPVerify() {
@@ -104,9 +115,11 @@ const App = (props) => {
                   onClick={onOTPVerify}
                   className="bg-emerald-600 w-full flex gap-1 items-center justify-center py-2.5 text-white rounded"
                 >
-                  {loading && (
-                    <CgSpinner size={20} className="mt-1 animate-spin" />
-                  )}
+                  {
+                    loading 
+                    && 
+                    (<CgSpinner size={20} className="mt-1 animate-spin" />)
+                  }
                   <span>Verify OTP</span>
                 </button>
               </>
