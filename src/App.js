@@ -235,6 +235,13 @@ function App() {
     // while(!contract);
   }, []);
 
+  useEffect(() => {
+    
+        getCandidates();
+    
+        // while(!contract);
+      }, [voterID]);
+      
   useEffect( () => {
     
     // console.log(votingStatus, "$$$$$$$$$voting status");
@@ -359,7 +366,7 @@ const logout = () => {
     <div className="App">
       { 
         (voterID !== null) ? 
-        // ( votingStatus ?
+        ( votingStatus ?
             (<Connected 
               voterID = {voterID}
               remainingTime = {remainingTime}
@@ -367,7 +374,7 @@ const logout = () => {
               candidates = {candidates}
               vote = {vote}
               CanVote = {CanVote}/>) 
-        // :  (<Finished  getWinnerName = {getWinnerName} verifyVote = {verifyVote} logout = {logout} not_voted = {CanVote}/>))
+        :  (<Finished  getWinnerName = {getWinnerName} verifyVote = {verifyVote} logout = {logout} not_voted = {CanVote}/>))
         :
         <PhoneNoLogin setvoterID = {setvoterID}/>
       }
