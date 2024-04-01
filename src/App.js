@@ -11,7 +11,9 @@ function App() {
   const [remainingTime, setremainingTime] = useState('');
   const [candidates, setCandidates] = useState([]);
   const [CanVote, setCanVote] = useState(true);
-  const [voterID, setvoterID] = useState(null);;
+  const [voterID, setvoterID] = useState(null);
+  const [winner, setWinner] = useState(null);
+  const [voteData, setVoteData] = useState(null);
   const [contract, setContract] = useState(null);
   const CONTRACT_ADDRESS ="0x7D6A5697f8846855a39f488E08d77055bED3cD87"
   const PRIVATE_KEY = "b3409f6f45ef522faf29c052914d13511ac5c6515aea2d138c6b9d70341815cf"
@@ -287,6 +289,14 @@ async function canVote() {
   }
 }
 
+const getCandidateNameByIndex = (index) => {
+  // Find the candidate object with the specified index
+  const candidate = candidates.find(candidate => candidate.index === index);
+
+  // Return the name of the candidate, or null if not found
+  return candidate ? candidate.name : null;
+};
+
 async function verifyVote() {
   try {
     if (!contract) return;
@@ -295,11 +305,10 @@ async function verifyVote() {
     const numberA = Number(vote);
     const numberB = Number(voteIndex);
     console.log(numberA, numberB, "#######");
-    return [numberA, numberB];
+    setVoteData([getCandidateNameByIndex(numberA), numberB]);
   } catch (error) {
     console.error('Error while verifying vote:', error);
     // Handle error gracefully (e.g., show an error message to the user)
-    return null;
   }
 }
 
@@ -320,16 +329,17 @@ async function getCandidates() {
   }
 }
 
+
+
 async function getWinnerName() {
   try {
     if (!contract) return;
 
     const winner = Number(await contract.getIndexOfMaxVoteCount());
-    return winner;
+    setWinner(getCandidateNameByIndex(winner));
   } catch (error) {
     console.error('Error while fetching winner name:', error);
     // Handle error gracefully (e.g., show an error message to the user)
-    return null;
   }
 }
 
@@ -374,7 +384,7 @@ const logout = () => {
               candidates = {candidates}
               vote = {vote}
               CanVote = {CanVote}/>) 
-        :  (<Finished  getWinnerName = {getWinnerName} verifyVote = {verifyVote} logout = {logout} not_voted = {CanVote}/>))
+        :  (<Finished  getWinnerName = {getWinnerName} winner = {winner} verifyVote = {verifyVote} voteData = {voteData} logout = {logout} not_voted = {CanVote}/>))
         :
         <PhoneNoLogin setvoterID = {setvoterID}/>
       }

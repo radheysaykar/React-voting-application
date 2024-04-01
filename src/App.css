@@ -1,3 +1,14 @@
+.App, .connected-container, .finished-container{
+  background-image: url('../public/Voting-Provider-Image.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  min-height: 100vh;
+  background-size: 200%;
+  background-position: 50% 40%;
+  backdrop-filter: blur(20%);
+}
+
 .login-container {
   display: flex;
   flex-direction: column;
@@ -80,7 +91,7 @@
 
 .candidates-table th, .candidates-table td {
   padding: 8px;
-  text-align: left;
+  text-align: center;
   border-bottom: 1px solid #ddd;
 }
 
