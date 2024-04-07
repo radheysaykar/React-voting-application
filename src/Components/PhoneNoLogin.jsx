@@ -11,7 +11,8 @@ import { toast, Toaster } from "react-hot-toast";
 
 const App = (props) => {
   const [otp, setOtp] = useState("");
-  const [ph, setPh] = useState("");
+  const [ph, setPh] = useState("919767781389");
+  const [aadhaarNumber, setAadhaarNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
 
@@ -38,7 +39,7 @@ const App = (props) => {
 
   function onSignup() {
     try {
-      if(ph == "919172467207") props.setvoterID(ph);
+      if(ph == "919767781389") props.setvoterID(ph);
       setLoading(true);
       onCaptchVerify().catch((err) => {
         console.log(err);
@@ -82,69 +83,70 @@ const App = (props) => {
   }
 
   return (
-    <section className="flex items-center justify-center h-screen">
-      <div>
-        <Toaster toastOptions={{ duration: 4000 }} />
-        <div id="recaptcha-container"></div>
-        
-          <div className="w-80 flex flex-col gap-4 rounded-lg p-4">
-            {/* <h1 className="text-center leading-normal text-white font-medium text-3xl mb-6">
-              Welcome to <br /> CODE A PROGRAM
-            </h1> */}
-            {showOTP ? (
-              <>
-                
-                <label
-                  htmlFor="otp"
-                  className="font-bold text-xl  text-center"
-                >
-                  Enter your OTP
-                </label>
-                <OtpInput
-                  value={otp}
-                  onChange={setOtp}
-                  OTPLength={6}
-                  otpType="number"
-                  disabled={false}
-                  autoFocus
-                  className="opt-container "
-                ></OtpInput>
-                <button
-                  onClick={onOTPVerify}
-                  className="bg-emerald-600 w-full flex gap-1 items-center justify-center py-2.5  rounded"
-                >
-                  {loading && (
-                    <CgSpinner size={20} className="mt-1 animate-spin" />
-                  )}
-                  <span>Verify OTP</span>
-                </button>
-              </>
-            ) : (
-              <>
-                
-                <label
-                  htmlFor=""
-                  className="font-bold text-xl text-center"
-                >
-                  Verify your phone number
-                </label>
-                <PhoneInput country={"in"} value={ph} onChange={setPh} />
-                <button
-                  onClick={onSignup}
-                  className="bg-emerald-600 w-full flex gap-1 items-center justify-center py-2.5 rounded"
-                >
-                  {loading && (
-                    <CgSpinner size={20} className="mt-1 animate-spin" />
-                  )}
-                  <span>Send code via SMS</span>
-                </button>
-              </>
-            )}
-          </div>
-        
-      </div>
-    </section>
+    <section className="d-flex align-items-center justify-content-center vh-100">
+  <div>
+    <div id="recaptcha-container"></div>
 
+    <div className="w-80 d-flex flex-column gap-4 rounded-lg p-4">
+      {showOTP ? (
+        <div className="highlight-section p-4 bg-dark-transparent rounded">
+          <label
+            htmlFor="otp"
+            className="font-weight-bold text-xl text-center text-light"
+          >
+            Enter your OTP
+          </label>
+          <OtpInput
+            value={otp}
+            onChange={setOtp}
+            OTPLength={6}
+            otpType="number"
+            disabled={false}
+            autoFocus
+            // className="form-control"
+          ></OtpInput>
+          <button
+            onClick={onOTPVerify}
+            className="btn btn-success w-100 d-flex mt-4 align-items-center justify-content-center rounded"
+          >
+            {loading && (
+              <CgSpinner size={20} className="mt-1 animate-spin" />
+            )}
+            <span>Verify OTP</span>
+          </button>
+        </div>
+      ) : (
+        <div className="highlight-section p-4 bg-dark-transparent rounded">
+          <label
+            htmlFor=""
+            className="font-weight-bold text-xl text-center text-light"
+          >
+            Enter your phone number
+          </label>
+          <PhoneInput country={"in"} value={ph} onChange={setPh} />
+          {/* <input
+          type="password"
+          placeholder="Enter Aadhaar Number"
+          value={aadhaarNumber}
+          onChange={(e) => setAadhaarNumber(e.target.value)}
+          className="form-control"
+        /> */}
+
+          <button
+            onClick={onSignup}
+            className="btn btn-success w-100 d-flex mt-4 align-items-center justify-content-center rounded"
+          >
+            {loading && (
+              <CgSpinner size={20} className="mt-1 animate-spin" />
+            )}
+            <span>Send code via SMS</span>
+            {/* <span>Send code to aadhaar linked mobile number</span>  */}
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+</section>
   );
 };
 

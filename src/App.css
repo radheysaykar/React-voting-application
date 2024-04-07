@@ -1,5 +1,5 @@
 .App, .connected-container, .finished-container{
-  background-image: url('../public/Voting-Provider-Image.png');
+  background-image: url('../public/Voting-Provider-Image.jpg');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -8,6 +8,15 @@
   background-position: 50% 40%;
   backdrop-filter: blur(20%);
 }
+
+.bg-dark-transparent {
+  background-color: rgba(0, 0, 0, 0.5); /* Adjust the opacity as needed */
+}
+
+.text-light {
+  color: #ffffff !important; /* Adjust the text color as needed */
+}
+
 
 .login-container {
   display: flex;
