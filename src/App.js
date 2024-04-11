@@ -6,6 +6,7 @@ import {ethers} from 'ethers';
 import PhoneNoLogin from './Components/PhoneNoLogin.jsx';
 import Finished from './Components/Finished';
 import Admin from './Components/Admin';
+import Registration from './Components/registration.jsx';
 import Connected from './Components/Connected';
 import './App.css';
 
@@ -532,6 +533,7 @@ const logout = () => {
       <div>
         <Routes>
           <Route path="/admin" element={<Admin startElection={startElection} handleAddCandidate={handleAddCandidate} handleRemoveCandidate={handleRemoveCandidate} getCandidates={getCandidates} candidates = {candidates}/>} />
+          <Route path="/register" element={<Registration/>} />
           <Route path="/"
             element={ 
               (voterID !== null) ? 

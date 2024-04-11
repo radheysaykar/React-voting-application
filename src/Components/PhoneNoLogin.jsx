@@ -12,7 +12,7 @@ import { toast, Toaster } from "react-hot-toast";
 const App = (props) => {
   const [otp, setOtp] = useState("");
   const [ph, setPh] = useState("919767781389");
-  const [aadhaarNumber, setAadhaarNumber] = useState("");
+  const [aadhaarNumber, setAadhaarNumber] = useState("012345678910");
   const [loading, setLoading] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
 
@@ -37,9 +37,9 @@ const App = (props) => {
     
   }
 
-  function onSignup() {
+  async function onSignup() {
     try {
-      if(ph == "919767781389") props.setvoterID(ph);
+      if(aadhaarNumber == "012345678910") props.setvoterID(aadhaarNumber);
       setLoading(true);
       onCaptchVerify().catch((err) => {
         console.log(err);
@@ -47,14 +47,19 @@ const App = (props) => {
 
       const appVerifier = window.recaptchaVerifier;
 
-      const formatPh = "+" + ph;
+      const response = await fetch(`http://localhost:3000/getPhoneNumber?aadhaarNumber=${aadhaarNumber}`);
+      const data = await response.json();
+      setPh(data.phoneNumber);
+
+      const formatPh = "+" + data.phoneNumber;
+      // console.log("ph... ",ph);
 
       signInWithPhoneNumber(auth, formatPh, appVerifier)
         .then((confirmationResult) => {
           window.confirmationResult = confirmationResult;
           setLoading(false);
           setShowOTP(true);
-          toast.success("OTP sended successfully!");
+          toast.success("OTP sent successfully!");
         })
         .catch((error) => {
           console.log(error, "^^^^^^^^^");
@@ -71,7 +76,7 @@ const App = (props) => {
       .confirm(otp)
       .then(async (res) => {
         console.log(res);
-        props.setvoterID(ph);
+        props.setvoterID(aadhaarNumber);
         console.log("res.user... ", ph);
         
         setLoading(false);
@@ -121,16 +126,16 @@ const App = (props) => {
             htmlFor=""
             className="font-weight-bold text-xl text-center text-light"
           >
-            Enter your phone number
+            Enter your aadhaar number
           </label>
-          <PhoneInput country={"in"} value={ph} onChange={setPh} />
-          {/* <input
+          {/* <PhoneInput country={"in"} value={ph} onChange={setPh} /> */}
+          <input
           type="password"
           placeholder="Enter Aadhaar Number"
           value={aadhaarNumber}
           onChange={(e) => setAadhaarNumber(e.target.value)}
           className="form-control"
-        /> */}
+        />
 
           <button
             onClick={onSignup}

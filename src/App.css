@@ -1,4 +1,4 @@
-.App, .connected-container, .finished-container{
+.App{
   background-image: url('../public/Voting-Provider-Image.jpg');
   background-size: cover;
   background-repeat: no-repeat;
