@@ -20,10 +20,10 @@ function App() {
   const [winner, setWinner] = useState(null);
   const [voteData, setVoteData] = useState(null);
   const [contract, setContract] = useState(null);
-  const CONTRACT_ADDRESS ="0x3cF8493397289FF35F21BF4286cbd6392Ec4491d"
+  const CONTRACT_ADDRESS ="0x7b665960A62eacD151D38b72fb3B82e94E1ee78e"
   const PRIVATE_KEY = "b3409f6f45ef522faf29c052914d13511ac5c6515aea2d138c6b9d70341815cf"
   const API_URL = "https://volta-rpc.energyweb.org"
-  const SimpleStorageABI =  [
+  const SimpleStorageABI = [
     {
       "inputs": [
         {
@@ -281,7 +281,7 @@ function App() {
       "stateMutability": "view",
       "type": "function"
     }
-  ];
+  ]
 
   useEffect(() => {
     // async function fetchContract() {
@@ -474,7 +474,8 @@ async function startElection(durationInMinutes) {
     await contract.startElection(durationInMinutes);
     setElectionStartedStatus(true);
     console.log(electionStartedStatus, "electionStartedStatus_______")
-    
+    toast.success('Election has started!');
+
   } catch (error) {
     console.error(error);
     // Handle error gracefully (e.g., show an error message to the user)

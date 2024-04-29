@@ -25,8 +25,8 @@ function Login(props) {
       props.setAdminName(username);
       // Redirect to dashboard or handle login success
     } catch (error) {
-      console.error('Login error:', error);
-      setError(error.message);
+      console.error('Login error:', error.message);
+      setError(error);
     }
   };
 
@@ -137,7 +137,7 @@ function Admin({ startElection, handleAddCandidate, handleRemoveCandidate, getCa
         (adminName)?
         (<div class="row d-flex flex-column justify-content-center align-items-center">
         <div class="col-md-6 text-white bg-dark-transparent">
-          <h2>Admin {adminName} Panel</h2>
+          <h2>Admin Panel</h2>
     
           {/* <!-- Black transparent box to highlight important areas --> */}
           <div class="p-3 mb-4">
@@ -150,7 +150,7 @@ function Admin({ startElection, handleAddCandidate, handleRemoveCandidate, getCa
                 value={candidateName}
                 onChange={(e) => setCandidateName(e.target.value)}
               />
-              <button class="btn btn-primardivy" onClick={handleAddCandidateClick}>Add Candidate</button>
+              <button class="btn btn-success" onClick={handleAddCandidateClick}>Add Candidate</button>
             </div>
           </div>
     

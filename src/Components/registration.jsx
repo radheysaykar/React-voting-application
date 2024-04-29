@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PhoneInput from "react-phone-input-2";
+import { toast, Toaster } from "react-hot-toast";
 
 
 const YourComponent = () => {
@@ -31,7 +32,7 @@ const YourComponent = () => {
       if (!response.ok) {
         throw new Error('Failed to add voter');
       }
-
+      toast.success("voter added successfully!");
       // Assuming response contains the new voter data
       const data = await response.json();
       setPhoneNumber(data.phoneNumber);
